@@ -100,4 +100,51 @@ public class UserServiceImpl implements UserService{
 		
 		return MAX_FAILED_ATTEMPTS;
 	}
+	
+	@Override
+	public long getRemainingTime(User user) {
+		long lockTimeInMillis = user.getLockTime().getTime();
+		long currentTimeInMillis = System.currentTimeMillis();
+
+		long remainingminutes;
+
+		long lockPeriodInMillis = currentTimeInMillis - lockTimeInMillis;
+
+		if(lockPeriodInMillis > LOCK_TIME_DURATION)
+		{
+			remainingminutes = 0; 
+		}
+		else
+		{
+			long remainingTimeInMillis = LOCK_TIME_DURATION - lockPeriodInMillis;
+			remainingminutes = convertMillisToMinutesAndSeconds(remainingTimeInMillis);
+		}
+
+		return remainingminutes;
+
+	}
+	
+	@Override
+	public long convertMillisToMinutesAndSeconds (long millis)
+	{
+		long totalSeconds = millis / 1000;
+		long minutes = totalSeconds / 60;
+		long seconds = totalSeconds % 60;
+	
+		return minutes;
+	}
+	
+	@Override
+	public boolean isLockTimeExpired(User user)
+	{
+		long lockTimeInMillis = user.getLockTime().getTime();
+		long currentTimeInMillis = System.currentTimeMillis();
+
+		if (lockTimeInMillis + LOCK_TIME_DURATION < currentTimeInMillis) {
+			return true;
+		}
+
+		return false;
+	}
+
 }

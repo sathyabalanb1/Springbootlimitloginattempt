@@ -37,22 +37,36 @@ public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHan
             if (user.isEnabled() && user.isAccountNonLocked()) {
                 if (user.getFailedAttempt() < userService.getMaximumFailedAttempts() - 1) {
                     userService.increaseFailedAttempts(user);
+                    response.sendRedirect("/invalid?badcredential=invalid");
                 } else {
                     userService.lock(user);
+                    response.sendRedirect("/invalid?lockederror=locked");
                     exception = new LockedException("Your account has been locked due to 3 failed attempts."
                             + " It will be unlocked after 24 hours.");
                 }
+            }else if(!user.isAccountNonLocked()){
+            	
+            	if(user.getFailedAttempt() == userService.getMaximumFailedAttempts()-1) {
+            		response.sendRedirect("/invalid?lockederror=locked");
+            	}
+            	
             } else if (!user.isAccountNonLocked()) {
                 if (userService.unlockWhenTimeExpired(user)) {
                     exception = new LockedException("Your account has been unlocked. Please try to login again.");
                 }
-            }
              
         }
          
-        super.setDefaultFailureUrl("/login?error");
-        super.onAuthenticationFailure(request, response, exception);
+   //     super.setDefaultFailureUrl("/login?error");
+   //     super.onAuthenticationFailure(request, response, exception);
+    }else {
+    	
+    	response.sendRedirect("/invalid?badcredential=invalid");
+    	
+
     }
  
 
+}
+    
 }

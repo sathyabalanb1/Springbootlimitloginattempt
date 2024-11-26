@@ -30,13 +30,32 @@ public class CustomLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 		
 			String email = SecurityContextHolder.getContext().getAuthentication().getName();
 			User user = userService.getByEmail(email);
-	     //   UserDetails userDetails =  (UserDetails) authentication.getPrincipal();
-	     //   User user = userDetails.getUser();
-	        if (user.getFailedAttempt() > 0) {
-	            userService.resetFailedAttempts(user.getEmail());
-	        }
+	        
+	        if(user.getLockTime() != null && !user.isAccountNonLocked()) {
+	        	
+	        		if(!userService.isLockTimeExpired(user)) {
+	        			
+	        			long minutes = userService.getRemainingTime(user);
+	    				
+	    				response.sendRedirect("/login?locktimecredentials="+minutes);
+	    				return;
+	    				
+	        		}else if(userService.isLockTimeExpired(user)) {
+	        			
+	        			response.sendRedirect("/forgotpassword/form");
+	        			return;
+	        		}
+	        		else if(user.getFailedAttempt() >0) {
+	        			
+	        			userService.unlockWhenTimeExpired(user);
+	        			
+	        		//	userService.resetFailedAttempts(user.getEmail());
+	        		}
+	        	}
+	        
+	        response.sendRedirect("/homepage");
 	         
-	        super.onAuthenticationSuccess(request, response, authentication);
+	   //     super.onAuthenticationSuccess(request, response, authentication);
 	}
 
 }

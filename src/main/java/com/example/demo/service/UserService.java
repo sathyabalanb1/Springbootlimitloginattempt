@@ -18,4 +18,11 @@ public interface UserService {
 	public boolean unlockWhenTimeExpired(User user);
 
 	public int getMaximumFailedAttempts();
+	
+	public long getRemainingTime(User user);
+	
+	public long convertMillisToMinutesAndSeconds (long millis);
+	
+	public boolean isLockTimeExpired(User user);
+
 }

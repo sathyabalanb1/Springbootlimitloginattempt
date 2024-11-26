@@ -6,8 +6,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.dto.UserDto;
+import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 
 import jakarta.validation.Valid;
@@ -48,8 +50,13 @@ public class UserController {
 	}
 	
 	@GetMapping("/login")
-	public String showLoginForm(Model model) {
-				
+	public String showLoginForm(Model model, @RequestParam(name="locktimecredentials", required=false) String locktimecredentials) {
+		
+		if(locktimecredentials != null) {
+			model.addAttribute("locktimecredentials", locktimecredentials);
+			return "loginform";
+		}
+		
 		return "loginform";
 	}
 	
@@ -58,5 +65,59 @@ public class UserController {
 				
 		return "homepage";
 	}
+	
+	@GetMapping("/invalid")
+	public String invalid(@RequestParam(name="badcredential", required=false) String badcredential,@RequestParam(name="locktimeerror", required=false) String locktimeerror,@RequestParam(name="lockederror", required=false) String lockederror,Model model)
+	{
+		if(locktimeerror != null)
+		{
+			model.addAttribute("locktimeerror", locktimeerror);
+			return "loginform";
+		}
+		else if(lockederror != null){
+			model.addAttribute("lockederror", lockederror);
+			return "loginform";
+		}
+		else
+		{
+			model.addAttribute("badcredential", badcredential);
+			return "loginform";
+		}
+	}
+	
+	@GetMapping("/forgotpassword/form")
+	public String displayForgotPasswordForm() {
+		
+		return "forgotpasswordform";
+	}
+	
+	@PostMapping("/forgotpassword/process")
+	public String forgotPasswordProcess(@RequestParam("username") String email,Model model)
+	{
+		User user = userService.getByEmail(email);
+
+		if(user != null)
+		{ 
+			if(user.getLockTime() != null)
+			{
+				if(!userService.isLockTimeExpired(user))
+				{
+					long balanceMinutes = userService.getRemainingTime(user);
+
+					model.addAttribute("balanceminutes", balanceMinutes);
+					return "forgotpasswordform";
+				}
+			}
+			model.addAttribute("user", user);
+			return "resetpasswordform";
+		}
+		else {
+			model.addAttribute("usernotexist", "User Doesn't Exist");
+			return "forgotpasswordform";
+		}
+
+	}
+
+
 
 }
