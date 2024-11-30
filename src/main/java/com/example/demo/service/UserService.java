@@ -24,5 +24,7 @@ public interface UserService {
 	public long convertMillisToMinutesAndSeconds (long millis);
 	
 	public boolean isLockTimeExpired(User user);
+	
+	public void updateNewPassword(int id, String password);
 
 }

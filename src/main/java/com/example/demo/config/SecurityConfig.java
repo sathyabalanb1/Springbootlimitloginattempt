@@ -53,11 +53,13 @@ public class SecurityConfig {
 		http.csrf().disable()
 		.authorizeHttpRequests((authorize) ->
 		authorize.requestMatchers(new AntPathRequestMatcher("/registerform")).permitAll()
+		.requestMatchers(new AntPathRequestMatcher("/js/**")).permitAll()
 		.requestMatchers(new AntPathRequestMatcher("/register/save")).permitAll()
 		.requestMatchers(new AntPathRequestMatcher("/homepage")).hasAnyRole("ADMIN", "USER")
 		.requestMatchers(new AntPathRequestMatcher("/invalid/**")).permitAll()
 		.requestMatchers(new AntPathRequestMatcher("/login/**")).permitAll()
 		.requestMatchers(new AntPathRequestMatcher("/forgotpassword/**")).permitAll()
+		
 		)
 		.formLogin( form  -> form
 				.loginPage("/login")

@@ -118,6 +118,36 @@ public class UserController {
 
 	}
 
+	@PostMapping("/forgotpassword/reset")
+	public String resetPasswordProcess(@RequestParam("newpassword") String newpassword, @RequestParam("useremail") String email,Model model)
+	{
+		System.out.println("Now we are in resetPasswordProcess method");
+		System.out.println(email);
+		
+		User user = userService.getByEmail(email);
+		
+		String oldpassword = user.getPassword();
+		
+		boolean validpassword = newpassword.equals(oldpassword);
+
+		if(validpassword == true)
+		{
+			model.addAttribute("samepassword","New Password should be differ from Old Password");
+			model.addAttribute("user",user);
+			return "resetpasswordform";
+		}		
+		
+		if(user.getLockTime() != null)
+		{
+		userService.unlockWhenTimeExpired(user);
+		}
+		
+		userService.updateNewPassword(user.getId(), newpassword);
+
+		return "loginform";
+
+
+	}
 
 
 }
