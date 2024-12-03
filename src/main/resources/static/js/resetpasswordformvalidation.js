@@ -7,6 +7,7 @@
         const confirmPassword = document.getElementById("confirmpassword");
         const passwordError = document.getElementById("passwordError");
         const passwordMatch = document.getElementById("passwordMatch");
+        const form = document.querySelector("form");
 
         confirmPassword.addEventListener("input", function () {
             if (confirmPassword.value === "") {
@@ -23,4 +24,13 @@
                 passwordMatch.style.display = "none";
             }
         });
+        
+        form.addEventListener("submit", function (event) {
+        if (newPassword.value !== confirmPassword.value) {
+            event.preventDefault(); // Prevent form submission
+            passwordError.style.display = "block";
+            passwordMatch.style.display = "none";
+            alert("Passwords do not match. Please correct this before submitting.");
+        }
+    });
     });

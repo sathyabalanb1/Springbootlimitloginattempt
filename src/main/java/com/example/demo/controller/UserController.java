@@ -121,8 +121,7 @@ public class UserController {
 	@PostMapping("/forgotpassword/reset")
 	public String resetPasswordProcess(@RequestParam("newpassword") String newpassword, @RequestParam("useremail") String email,Model model)
 	{
-		System.out.println("Now we are in resetPasswordProcess method");
-		System.out.println(email);
+		
 		
 		User user = userService.getByEmail(email);
 		
